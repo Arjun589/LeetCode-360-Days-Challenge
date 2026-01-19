@@ -1,0 +1,47 @@
+𝗗𝗮𝘆 15 𝗼𝗳 𝟯𝟲𝟬 days of LeetCode Challenge.
+
+𝗣𝗿𝗼𝗯𝗹𝗲𝗺 𝗦𝘁𝗮𝘁𝗲𝗺𝗲𝗻𝘁 :-1292. Maximum Side Length of a Square with Sum Less than or Equal to Threshold.
+Given a m x n matrix mat and an integer threshold, return the maximum side-length of a square with a sum less than or equal to threshold or return 0 if there is no such square.
+
+𝗣𝗿𝗼𝗯𝗹𝗲𝗺 𝗹𝗶𝗻𝗸:- https://leetcode.com/problems/maximum-side-length-of-a-square-with-sum-less-than-or-equal-to-threshold
+
+𝗛𝗶𝗻𝘁:- Hint: Use 2D prefix sums of matrix and then followed by either binary search or greedy approach.
+
+Code:- 
+
+
+public class Solution {
+    public int MaxSideLength(int[][] mat, int threshold) {
+        int m = mat.Length;
+        int n = mat[0].Length;
+        int[,] pref = new int[m + 1, n + 1];
+
+        // 1. Build 2D Prefix Sum table
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= n; j++) {
+                pref[i, j] = mat[i - 1][j - 1] + pref[i - 1, j] + 
+                             pref[i, j - 1] - pref[i - 1, j - 1];
+            }
+        }
+
+        int maxK = 0;
+        // 2. Search for the largest k
+        for (int i = 0; i <= m; i++) {
+            for (int j = 0; j <= n; j++) {
+                // While a larger square starting here is within bounds 
+                // and satisfies the threshold, increment maxK
+                while (i + maxK + 1 <= m && j + maxK + 1 <= n && 
+                       GetSum(pref, i, j, maxK + 1) <= threshold) {
+                    maxK++;
+                }
+            }
+        }
+
+        return maxK;
+    }
+
+    private int GetSum(int[,] pref, int i, int j, int k) {
+        // Returns the sum of the k x k square starting at (i, j)
+        return pref[i + k, j + k] - pref[i, j + k] - pref[i + k, j] + pref[i, j];
+    }
+}
